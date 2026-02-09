@@ -270,8 +270,8 @@ def main() -> None:
     parser.add_argument("file", nargs="?", help="Path to a CSV file")
     parser.add_argument(
         "--dir",
-        default=os.path.expanduser("~/Downloads"),
-        help="Directory to scan for CSV files (default: ~/Downloads)",
+        default=os.path.expanduser("~/Downloads/Spreadsheets"),
+        help="Directory to scan for CSV files (default: ~/Downloads/Spreadsheets)",
     )
     args = parser.parse_args()
 
