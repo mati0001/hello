@@ -1,0 +1,16 @@
+name,age,salary,department,city,rating
+Alice,30,72000,Engineering,New York,4.5
+Bob,25,55000,Marketing,Chicago,3.8
+Charlie,35,95000,Engineering,San Francisco,4.9
+Diana,28,,Sales,New York,4.1
+Eve,32,68000,Marketing,,3.5
+Frank,,82000,Engineering,Chicago,4.7
+Grace,29,61000,Sales,San Francisco,
+Hannah,45,110000,Engineering,New York,4.8
+Ivan,38,73000,Marketing,Chicago,3.2
+Julia,27,58000,Sales,San Francisco,4.0
+Kevin,33,77000,Engineering,New York,4.3
+Laura,26,52000,Marketing,Chicago,3.9
+Mike,41,98000,Engineering,San Francisco,4.6
+Nancy,30,65000,Sales,,3.7
+Oscar,36,88000,Marketing,New York,4.2
