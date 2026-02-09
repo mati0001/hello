@@ -15,6 +15,7 @@ import argparse
 import os
 import sys
 
+import matplotlib.pyplot as plt
 import pandas as pd
 from tabulate import tabulate
 
@@ -183,6 +184,59 @@ def profile_correlations(df: pd.DataFrame) -> None:
         print("  (none)")
 
 
+def plot_top_correlations(df: pd.DataFrame, filepath: str, top_n: int = 10) -> None:
+    numeric_cols = df.select_dtypes(include="number").columns.tolist()
+    if len(numeric_cols) < 2:
+        print("\n  Not enough numeric columns to plot correlations.")
+        return
+
+    section("9. TOP CORRELATION PAIRS (graph)")
+
+    corr = df[numeric_cols].corr()
+
+    # collect all unique pairs with their absolute correlation
+    pairs = []
+    for i, c1 in enumerate(numeric_cols):
+        for c2 in numeric_cols[i + 1:]:
+            r = corr.loc[c1, c2]
+            pairs.append((f"{c1}  vs  {c2}", r))
+
+    # sort by absolute value, take top N
+    pairs.sort(key=lambda x: abs(x[1]), reverse=True)
+    pairs = pairs[:top_n]
+
+    if not pairs:
+        print("  No column pairs to plot.")
+        return
+
+    labels = [p[0] for p in pairs]
+    values = [p[1] for p in pairs]
+    colors = ["#e74c3c" if v < 0 else "#2ecc71" for v in values]
+
+    fig, ax = plt.subplots(figsize=(10, max(4, len(pairs) * 0.6)))
+    bars = ax.barh(labels[::-1], values[::-1], color=colors[::-1], edgecolor="white")
+    ax.set_xlabel("Pearson Correlation")
+    ax.set_title(f"Top {len(pairs)} Most Correlated Column Pairs")
+    ax.set_xlim(-1.05, 1.05)
+    ax.axvline(x=0, color="gray", linewidth=0.5)
+
+    # add value labels on bars
+    for bar, val in zip(bars, values[::-1]):
+        x_pos = bar.get_width() + (0.03 if val >= 0 else -0.03)
+        ax.text(x_pos, bar.get_y() + bar.get_height() / 2,
+                f"{val:.2f}", va="center", ha="left" if val >= 0 else "right",
+                fontsize=9, fontweight="bold")
+
+    plt.tight_layout()
+
+    # save next to the CSV file
+    base = os.path.splitext(filepath)[0]
+    output_path = f"{base}_top_correlations.png"
+    plt.savefig(output_path, dpi=150)
+    plt.close()
+    print(f"  Graph saved to: {output_path}")
+
+
 def profile_sample(df: pd.DataFrame, n: int = 5) -> None:
     section("8. SAMPLE DATA (first rows)")
     print(tabulate(df.head(n), headers="keys", tablefmt="simple", showindex=False))
@@ -203,6 +257,7 @@ def profile_csv(filepath: str) -> None:
     profile_categorical_stats(df)
     profile_value_distributions(df)
     profile_correlations(df)
+    plot_top_correlations(df, filepath)
     profile_sample(df)
 
     print(f"\n{'=' * 60}")
