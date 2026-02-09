@@ -19,6 +19,14 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from tabulate import tabulate
 
+# Build a compatible list of categorical dtypes (pandas <3 rejects "str")
+_CAT_DTYPES: list[str] = ["object", "category"]
+try:
+    pd.DataFrame().select_dtypes(include=["str"])
+    _CAT_DTYPES.append("str")
+except TypeError:
+    pass
+
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -125,7 +133,7 @@ def profile_numeric_stats(df: pd.DataFrame) -> None:
 
 
 def profile_categorical_stats(df: pd.DataFrame) -> None:
-    cat_cols = df.select_dtypes(include=["object", "category", "str"]).columns.tolist()
+    cat_cols = df.select_dtypes(include=_CAT_DTYPES).columns.tolist()
     if not cat_cols:
         return
 
@@ -145,7 +153,7 @@ def profile_categorical_stats(df: pd.DataFrame) -> None:
 
 
 def profile_value_distributions(df: pd.DataFrame, top_n: int = 5) -> None:
-    cat_cols = df.select_dtypes(include=["object", "category", "str"]).columns.tolist()
+    cat_cols = df.select_dtypes(include=_CAT_DTYPES).columns.tolist()
     if not cat_cols:
         return
 
